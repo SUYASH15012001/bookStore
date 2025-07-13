@@ -7,13 +7,14 @@ import {
   Typography,
   Box,
   Link,
-  Alert,
   useTheme,
   useMediaQuery
 } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useAuth } from '../utils/AuthContext';
+import { validateLoginForm, clearFieldError, isFormValid } from '../utils/validation';
+import { showSuccessMessage, withFormHandling } from '../utils/errorHandler';
+import { MESSAGES, ROUTES } from '../constants/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -28,25 +29,6 @@ const Login = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -55,34 +37,23 @@ const Login = () => {
     }));
     
     // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    clearFieldError(errors, setErrors, name);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = withFormHandling(async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    const validationErrors = validateLoginForm(formData);
+    setErrors(validationErrors);
+    
+    if (!isFormValid(validationErrors)) {
       return;
     }
     
-    setLoading(true);
-    
-    try {
-      await login(formData);
-      toast.success('Login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      const message = error.response?.data?.message || 'Login failed. Please try again.';
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    await login(formData);
+    showSuccessMessage(MESSAGES.LOGIN_SUCCESS);
+    navigate(ROUTES.DASHBOARD);
+  }, setLoading);
 
   return (
     <Container maxWidth="sm">

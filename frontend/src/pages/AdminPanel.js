@@ -24,9 +24,11 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { toast } from 'react-toastify';
 import { booksAPI } from '../utils/api';
 import CustomPagination from '../components/Pagination';
+import { validateBookForm, clearFieldError, isFormValid } from '../utils/validation';
+import { showSuccessMessage, withFormHandling } from '../utils/errorHandler';
+import { MESSAGES, GENRES, PAGINATION } from '../constants/api';
 
 const AdminPanel = () => {
   const [books, setBooks] = useState([]);
@@ -43,22 +45,16 @@ const AdminPanel = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: PAGINATION.DEFAULT_PAGE,
     totalPages: 1,
     totalBooks: 0,
-    booksPerPage: 12
+    booksPerPage: PAGINATION.DEFAULT_LIMIT
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const genres = [
-    'Fiction', 'Non-Fiction', 'Mystery', 'Science Fiction', 
-    'Fantasy', 'Romance', 'Thriller', 'Biography', 
-    'History', 'Self-Help'
-  ];
 
   const fetchBooks = async (page = pagination.currentPage) => {
     setLoading(true);
@@ -79,7 +75,6 @@ const AdminPanel = () => {
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to fetch books';
       setError(message);
-      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -91,38 +86,9 @@ const AdminPanel = () => {
   }, []);
 
   const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
-    } else if (formData.title.length < 2) {
-      newErrors.title = 'Title must be at least 2 characters';
-    } else if (formData.title.length > 200) {
-      newErrors.title = 'Title must be at most 200 characters';
-    }
-    
-    if (!formData.author.trim()) {
-      newErrors.author = 'Author is required';
-    } else if (formData.author.length < 2) {
-      newErrors.author = 'Author must be at least 2 characters';
-    } else if (formData.author.length > 100) {
-      newErrors.author = 'Author must be at most 100 characters';
-    }
-    
-    if (!formData.genre) {
-      newErrors.genre = 'Genre is required';
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (formData.description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
-    } else if (formData.description.length > 1000) {
-      newErrors.description = 'Description must be at most 1000 characters';
-    }
-    
-    setFormErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validationErrors = validateBookForm(formData);
+    setFormErrors(validationErrors);
+    return isFormValid(validationErrors);
   };
 
   const handleOpenDialog = (book = null) => {
@@ -159,33 +125,24 @@ const AdminPanel = () => {
     setFormErrors({});
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = withFormHandling(async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
     
-    setSubmitting(true);
-    
-    try {
-      if (editingBook) {
-        await booksAPI.update(editingBook.id, formData);
-        toast.success('Book updated successfully!');
-      } else {
-        await booksAPI.create(formData);
-        toast.success('Book created successfully!');
-      }
-      
-      handleCloseDialog();
-      fetchBooks();
-    } catch (error) {
-      const message = error.response?.data?.message || 'Operation failed';
-      toast.error(message);
-    } finally {
-      setSubmitting(false);
+    if (editingBook) {
+      await booksAPI.update(editingBook.id, formData);
+      showSuccessMessage(MESSAGES.BOOK_UPDATED);
+    } else {
+      await booksAPI.create(formData);
+      showSuccessMessage(MESSAGES.BOOK_CREATED);
     }
-  };
+    
+    handleCloseDialog();
+    fetchBooks();
+  }, setSubmitting);
 
   const handleDelete = (bookId) => {
     setBookToDelete(bookId);
@@ -195,11 +152,10 @@ const AdminPanel = () => {
     if (!bookToDelete) return;
     try {
       await booksAPI.delete(bookToDelete);
-      toast.success('Book deleted successfully!');
+      showSuccessMessage(MESSAGES.BOOK_DELETED);
       fetchBooks();
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to delete book';
-      toast.error(message);
+      // Error handling is done by the API interceptor
     } finally {
       setDeleteDialogOpen(false);
       setBookToDelete(null);
@@ -217,12 +173,7 @@ const AdminPanel = () => {
       [name]: value
     }));
     
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    clearFieldError(formErrors, setFormErrors, name);
   };
 
   const handlePageChange = (page) => {
@@ -391,7 +342,7 @@ const AdminPanel = () => {
                     onChange={handleChange}
                     disabled={submitting}
                   >
-                    {genres.map((genre) => (
+                    {GENRES.map((genre) => (
                       <MenuItem key={genre} value={genre}>
                         {genre}
                       </MenuItem>

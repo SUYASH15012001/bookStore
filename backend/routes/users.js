@@ -1,11 +1,12 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
+const { sendSuccessResponse } = require('../utils/errorHandler');
 
 const router = express.Router();
 
 // Get current user info
 router.get('/me', authenticateToken, (req, res) => {
-  res.json({
+  sendSuccessResponse(res, {
     user: {
       id: req.user.id,
       name: req.user.name,

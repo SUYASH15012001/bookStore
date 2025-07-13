@@ -13,6 +13,7 @@ import {
   Paper
 } from '@mui/material';
 import { Search, Clear } from '@mui/icons-material';
+import { GENRES, SORT_CONFIG } from '../constants/api';
 
 const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
   const theme = useTheme();
@@ -84,16 +85,11 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
               onChange={handleChange('genre')}
             >
               <MenuItem value=""><em>All Genres</em></MenuItem>
-              <MenuItem value="Fiction">Fiction</MenuItem>
-              <MenuItem value="Non-Fiction">Non-Fiction</MenuItem>
-              <MenuItem value="Mystery">Mystery</MenuItem>
-              <MenuItem value="Science Fiction">Science Fiction</MenuItem>
-              <MenuItem value="Fantasy">Fantasy</MenuItem>
-              <MenuItem value="Romance">Romance</MenuItem>
-              <MenuItem value="Thriller">Thriller</MenuItem>
-              <MenuItem value="Biography">Biography</MenuItem>
-              <MenuItem value="History">History</MenuItem>
-              <MenuItem value="Self-Help">Self-Help</MenuItem>
+              {GENRES.map((genre) => (
+                <MenuItem key={genre} value={genre}>
+                  {genre}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -102,7 +98,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             <InputLabel id="sortby-label">Sort By</InputLabel>
             <Select
               labelId="sortby-label"
-              value={filters.sortBy || 'created_at'}
+              value={filters.sortBy || SORT_CONFIG.DEFAULT_FIELD}
               label="Sort By"
               onChange={handleChange('sortBy')}
             >
@@ -119,7 +115,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             <InputLabel id="sortorder-label">Sort Direction</InputLabel>
             <Select
               labelId="sortorder-label"
-              value={filters.sortOrder || 'DESC'}
+              value={filters.sortOrder || SORT_CONFIG.DEFAULT_ORDER}
               label="Sort Direction"
               onChange={handleChange('sortOrder')}
             >

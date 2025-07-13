@@ -1,16 +1,20 @@
-const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
+const { STATUS_CODES, MESSAGES } = require('../constants/statusCodes');
+const { verifyToken, extractTokenFromHeader } = require('../utils/jwt');
+const { sendErrorResponse } = require('../utils/errorHandler');
 
 const authenticateToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: 'Access token required' });
-  }
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = extractTokenFromHeader(req.headers['authorization']);
+
+    if (!token) {
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({ 
+        success: false,
+        message: MESSAGES.ACCESS_TOKEN_REQUIRED 
+      });
+    }
+
+    const decoded = verifyToken(token);
     
     // Get user from database to ensure they still exist
     const result = await pool.query(
@@ -19,19 +23,28 @@ const authenticateToken = async (req, res, next) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ message: 'User not found' });
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({ 
+        success: false,
+        message: MESSAGES.USER_NOT_FOUND 
+      });
     }
 
     req.user = result.rows[0];
     next();
   } catch (error) {
-    return res.status(403).json({ message: 'Invalid token' });
+    sendErrorResponse(res, error, {
+      method: req.method,
+      url: req.url
+    });
   }
 };
 
 const requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Admin access required' });
+    return res.status(STATUS_CODES.FORBIDDEN).json({ 
+      success: false,
+      message: MESSAGES.ADMIN_ACCESS_REQUIRED 
+    });
   }
   next();
 };

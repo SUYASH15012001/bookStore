@@ -11,8 +11,10 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useAuth } from '../utils/AuthContext';
+import { validateRegisterForm, clearFieldError, isFormValid } from '../utils/validation';
+import { showSuccessMessage, withFormHandling } from '../utils/errorHandler';
+import { MESSAGES, ROUTES } from '../constants/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -30,34 +32,16 @@ const Register = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const validateForm = () => {
-    const newErrors = {};
+    const validationErrors = validateRegisterForm(formData);
     
-    if (!formData.name) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.length < 3) {
-      newErrors.name = 'Name must be at least 3 characters';
-    }
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    
+    // Add password confirmation validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      validationErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      validationErrors.confirmPassword = 'Passwords do not match';
     }
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return validationErrors;
   };
 
   const handleChange = (e) => {
@@ -68,35 +52,24 @@ const Register = () => {
     }));
     
     // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    clearFieldError(errors, setErrors, name);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = withFormHandling(async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    
+    if (!isFormValid(validationErrors)) {
       return;
     }
     
-    setLoading(true);
-    
-    try {
-      const { name, email, password } = formData;
-      await register({ name, email, password });
-      toast.success('Registration successful! Welcome to Book Reviews!');
-      navigate('/dashboard');
-    } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed. Please try again.';
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const { name, email, password } = formData;
+    await register({ name, email, password });
+    showSuccessMessage('Registration successful! Welcome to Book Reviews!');
+    navigate(ROUTES.DASHBOARD);
+  }, setLoading);
 
   return (
     <Container maxWidth="sm">

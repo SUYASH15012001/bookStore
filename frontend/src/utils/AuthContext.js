@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from './api';
+import { STORAGE_KEYS } from '../constants/api';
+import { handleApiError } from './errorHandler';
 
 const AuthContext = createContext();
 
@@ -16,15 +18,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     if (token) {
       authAPI.getCurrentUser()
         .then(response => {
           setUser(response.data.user);
         })
-        .catch(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+        .catch((error) => {
+          console.error('Failed to get current user:', error);
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.USER);
         })
         .finally(() => {
           setLoading(false);
@@ -35,30 +38,46 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const response = await authAPI.login(credentials);
-    const { user, token } = response.data;
-    
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    
-    return response.data;
+    try {
+      const response = await authAPI.login(credentials);
+      const { user, token } = response.data;
+      
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      setUser(user);
+      
+      return response.data;
+    } catch (error) {
+      handleApiError(error, {
+        400: 'Invalid credentials. Please check your email and password.',
+        401: 'Invalid credentials. Please check your email and password.'
+      });
+      throw error;
+    }
   };
 
   const register = async (userData) => {
-    const response = await authAPI.register(userData);
-    const { user, token } = response.data;
-    
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    
-    return response.data;
+    try {
+      const response = await authAPI.register(userData);
+      const { user, token } = response.data;
+      
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      setUser(user);
+      
+      return response.data;
+    } catch (error) {
+      handleApiError(error, {
+        400: 'Registration failed. Please check your input.',
+        409: 'User with this email already exists.'
+      });
+      throw error;
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
     setUser(null);
   };
 
