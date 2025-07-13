@@ -2,6 +2,31 @@
 
 A modern React frontend for the book review platform built with Material-UI (MUI).
 
+## Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd frontend
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Create a `.env` file (optional):**
+   ```bash
+   # In the frontend directory
+   echo "REACT_APP_API_URL=http://localhost:3001" > .env
+   ```
+   - This sets the backend API URL. Adjust if your backend runs elsewhere.
+4. **Start the development server:**
+   ```bash
+   npm start
+   ```
+   - The app will open at [http://localhost:3000](http://localhost:3000)
+
+---
+
 ## Features
 
 - **Responsive Design**: Mobile-first approach with responsive layouts

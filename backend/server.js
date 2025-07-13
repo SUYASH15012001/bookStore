@@ -7,6 +7,7 @@ const { sendErrorResponse } = require('./utils/errorHandler')
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env') })
+dotenv.config({ path: path.resolve(__dirname, '.env.local') })
 
 const app = express()
 

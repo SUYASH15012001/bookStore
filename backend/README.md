@@ -2,6 +2,41 @@
 
 A Node.js/Express backend for the book review platform with PostgreSQL database.
 
+## Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd backend
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Create a `.env` or a `.env.local` file:**
+   ```bash
+   # In the backend directory
+   touch .env
+   # Add the following variables to .env:
+   # PORT=3001
+   # DB_USER=postgres
+   # DB_HOST=localhost
+   # DB_NAME=bookreview_db
+   # DB_PASSWORD=your_password
+   # DB_PORT=5432
+   # JWT_SECRET=your-super-secret-jwt-key
+   ```
+4. **Create the PostgreSQL database:**
+   - Make sure PostgreSQL is running.
+   - Create the database specified in your `.env` (e.g., `bookreview_db`).
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   - The backend will run at [http://localhost:3001](http://localhost:3001) by default.
+
+---
+
 ## Features
 
 - User authentication with JWT
@@ -10,32 +45,6 @@ A Node.js/Express backend for the book review platform with PostgreSQL database.
 - Review system
 - Search and filtering
 - Pagination
-
-## Setup
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Configure environment variables:
-Create a `.env` file with the following variables:
-```
-PORT=3001
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=bookreview_db
-DB_PASSWORD=your_password
-DB_PORT=5432
-JWT_SECRET=your-super-secret-jwt-key
-```
-
-3. Make sure PostgreSQL is running and the database is created.
-
-4. Start the development server:
-```bash
-npm run dev
-```
 
 ## API Endpoints
 
