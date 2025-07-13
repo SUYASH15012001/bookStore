@@ -141,7 +141,7 @@ const BookDetails = () => {
 
       <Grid container spacing={isMobile ? 2 : 4}>
         {/* Book Information */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ p: isMobile ? 2 : 3, mb: 3 }}>
             <Typography 
               variant="h4" 
@@ -268,7 +268,7 @@ const BookDetails = () => {
         </Grid>
 
         {/* Sidebar */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: isMobile ? 2 : 3, position: 'sticky', top: 20 }}>
             <Typography variant="h6" gutterBottom>
               Book Details

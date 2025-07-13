@@ -162,16 +162,6 @@ router.post('/:bookId/reviews', [
       return res.status(404).json({ message: 'Book not found' });
     }
 
-    // Check if user has already reviewed this book
-    const existingReview = await pool.query(
-      'SELECT * FROM reviews WHERE user_id = $1 AND book_id = $2',
-      [userId, bookId]
-    );
-
-    if (existingReview.rows.length > 0) {
-      return res.status(400).json({ message: 'You have already reviewed this book' });
-    }
-
     // Create review
     const result = await pool.query(
       'INSERT INTO reviews (user_id, book_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING *',
@@ -194,6 +184,9 @@ router.post('/:bookId/reviews', [
       review: reviewWithUser.rows[0]
     });
   } catch (error) {
+    if (err.code === '23505') {
+      return res.status(400).json({ message: 'You have already reviewed this book' });
+    }
     console.error('Add review error:', error);
     res.status(500).json({ message: 'Server error' });
   }
@@ -255,6 +248,9 @@ router.post('/', [
     });
   } catch (error) {
     console.error('Create book error:', error);
+    if (err.code === '23505') {
+      return res.status(400).json({ message: 'A book with the same title, author, and genre already exists.' });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -281,6 +277,17 @@ router.put('/:id', [
     const bookExists = await pool.query('SELECT * FROM books WHERE id = $1', [id]);
     if (bookExists.rows.length === 0) {
       return res.status(404).json({ message: 'Book not found' });
+    }
+
+    // Check for uniqueness if title, author, or genre is being updated
+    if (title !== undefined && author !== undefined && genre !== undefined) {
+      const duplicate = await pool.query(
+        'SELECT * FROM books WHERE title = $1 AND author = $2 AND genre = $3 AND id <> $4',
+        [title, author, genre, id]
+      );
+      if (duplicate.rows.length > 0) {
+        return res.status(400).json({ message: 'A book with the same title, author, and genre already exists.' });
+      }
     }
 
     // Build update query dynamically

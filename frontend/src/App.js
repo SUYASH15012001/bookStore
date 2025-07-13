@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+      import CircularProgress from '@mui/material/CircularProgress';
 
 import { AuthProvider, useAuth } from './utils/AuthContext';
 import Navbar from './components/Navbar';
@@ -56,6 +57,18 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
   return children;
 };
 
+// Public Route Component (for login/register)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+      <CircularProgress />
+    </Box>
+  );
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
 // Main App Component
 const AppContent = () => {
   const { isAuthenticated } = useAuth();
@@ -66,8 +79,8 @@ const AppContent = () => {
         {isAuthenticated && <Navbar />}
         <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
             <Route 
               path="/dashboard" 
               element={

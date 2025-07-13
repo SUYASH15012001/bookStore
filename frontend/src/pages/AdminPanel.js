@@ -26,6 +26,7 @@ import {
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { booksAPI } from '../utils/api';
+import CustomPagination from '../components/Pagination';
 
 const AdminPanel = () => {
   const [books, setBooks] = useState([]);
@@ -41,6 +42,12 @@ const AdminPanel = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalBooks: 0,
+    booksPerPage: 12
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -51,10 +58,22 @@ const AdminPanel = () => {
     'History', 'Self-Help'
   ];
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (page = pagination.currentPage) => {
+    setLoading(true);
+    setError('');
     try {
-      const response = await booksAPI.getAll({ limit: 100 });
+      const params = {
+        page,
+        limit: pagination.booksPerPage
+      };
+      const response = await booksAPI.getAll(params);
       setBooks(response.data.books);
+      setPagination(prev => ({
+        ...prev,
+        currentPage: page,
+        totalPages: response.data.pagination.totalPages,
+        totalBooks: response.data.pagination.totalBooks
+      }));
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to fetch books';
       setError(message);
@@ -65,7 +84,8 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    fetchBooks();
+    fetchBooks(1);
+    // eslint-disable-next-line
   }, []);
 
   const validateForm = () => {
@@ -183,6 +203,10 @@ const AdminPanel = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    fetchBooks(page);
+  };
+
   if (loading) {
     return (
       <Container maxWidth="lg">
@@ -226,7 +250,7 @@ const AdminPanel = () => {
 
       <Grid container spacing={isMobile ? 2 : 3}>
         {books.map((book) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={book.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }} key={book.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" component="h2" gutterBottom>
@@ -274,6 +298,13 @@ const AdminPanel = () => {
           </Grid>
         ))}
       </Grid>
+      <CustomPagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalBooks}
+        itemsPerPage={pagination.booksPerPage}
+        onPageChange={handlePageChange}
+      />
 
       {books.length === 0 && !loading && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -300,7 +331,7 @@ const AdminPanel = () => {
         <Box component="form" onSubmit={handleSubmit}>
           <DialogContent>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Title"
@@ -313,7 +344,7 @@ const AdminPanel = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Author"
@@ -326,7 +357,7 @@ const AdminPanel = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth error={!!formErrors.genre} required>
                   <InputLabel>Genre</InputLabel>
                   <Select
@@ -344,7 +375,7 @@ const AdminPanel = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
                   label="Description"

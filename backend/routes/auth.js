@@ -21,16 +21,6 @@ router.post('/register', [
 
     const { name, email, password } = req.body;
 
-    // Check if user already exists
-    const userExists = await pool.query(
-      'SELECT * FROM users WHERE email = $1 OR name = $2',
-      [email, name]
-    );
-
-    if (userExists.rows.length > 0) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
     // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -62,7 +52,10 @@ router.post('/register', [
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    if (err.code === '23505') {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+    res.status(500).json({ message: error.message || 'Server error' });
   }
 });
 

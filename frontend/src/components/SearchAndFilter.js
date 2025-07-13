@@ -28,8 +28,8 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
 
   return (
     <Paper sx={{ p: isMobile ? 2 : 3, mb: 3 }}>
-      <Grid container spacing={2} direction={isMobile ? 'column' : 'row'} wrap="wrap" alignItems="center">
-        <Grid item xs={12} sm={6} md={2.4} lg={2}>
+      <Grid container spacing={2} alignItems="center">
+        <Grid size={{ xs: 12, sm: 6, md: 2}}>
           <TextField
             fullWidth
             label="Search by title"
@@ -41,7 +41,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4} lg={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }} >
           <TextField
             fullWidth
             label="Filter by author"
@@ -50,7 +50,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             size="small"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4} lg={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <FormControl fullWidth size="small">
             <InputLabel id="genre-label">Genre</InputLabel>
             <Select
@@ -73,7 +73,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4} lg={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <FormControl fullWidth size="small">
             <InputLabel id="sortby-label">Sort By</InputLabel>
             <Select
@@ -90,7 +90,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4} lg={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }} >
           <FormControl fullWidth size="small">
             <InputLabel id="sortorder-label">Sort Direction</InputLabel>
             <Select
@@ -104,7 +104,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} md={12} lg={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }} >
           <Box sx={{ display: 'flex', gap: 2, justifyContent: isMobile ? 'flex-start' : 'flex-end', height: '100%' }}>
             <Button
               variant="outlined"
