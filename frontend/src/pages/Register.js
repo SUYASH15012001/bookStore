@@ -14,7 +14,7 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
 import { validateRegisterForm, clearFieldError, isFormValid } from '../utils/validation';
 import { showSuccessMessage, withFormHandling } from '../utils/errorHandler';
-import { MESSAGES, ROUTES } from '../constants/api';
+import { ROUTES } from '../constants/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({

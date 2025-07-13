@@ -42,7 +42,7 @@ const BookDetails = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [commentError, setCommentError] = useState('');
 
-  const fetchBook = async () => {
+  const fetchBook = React.useCallback(async () => {
     try {
       const response = await booksAPI.getById(id);
       setBook(response.data.book);
@@ -53,9 +53,9 @@ const BookDetails = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = React.useCallback(async () => {
     try {
       const response = await reviewsAPI.getByBookId(id);
       setReviews(response.data.reviews);
@@ -64,12 +64,12 @@ const BookDetails = () => {
     } finally {
       setReviewsLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchBook();
     fetchReviews();
-  }, [id]);
+  }, [id, fetchBook, fetchReviews]);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();

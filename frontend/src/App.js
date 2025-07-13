@@ -106,11 +106,20 @@ const AppContent = () => {
               } 
             />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Catch-all route for non-existent paths */}
+            <Route path="*" element={<CatchAllRedirect />} />
           </Routes>
         </Box>
       </Box>
     </Router>
   );
+};
+
+// Catch-all redirect component
+const CatchAllRedirect = () => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return null;
+  return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />;
 };
 
 function App() {

@@ -9,11 +9,68 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 import { booksAPI } from '../utils/api';
 import BookCard from '../components/BookCard';
 import SearchAndFilter from '../components/SearchAndFilter';
 import CustomPagination from '../components/Pagination';
+
+const StyledContainer = styled(Container)(({ theme }) => ({
+  background: theme.palette.background.paper,
+  borderRadius: 16,
+  boxShadow: theme.shadows[2],
+  paddingTop: theme.spacing(4),
+  paddingBottom: theme.spacing(5),
+  paddingLeft: theme.spacing(3),
+  paddingRight: theme.spacing(3),
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(5),
+  minHeight: '80vh',
+  [theme.breakpoints.down('sm')]: {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+  },
+}));
+
+const HeaderSection = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(4),
+}));
+
+const Title = styled(Typography)(({ theme }) => ({
+  fontWeight: 600,
+  color: theme.palette.primary.main,
+  letterSpacing: '-0.5px',
+  textAlign: 'left',
+  [theme.breakpoints.down('sm')]: {
+    textAlign: 'center',
+  },
+}));
+
+const Subtitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  marginBottom: theme.spacing(1),
+  textAlign: 'left',
+  [theme.breakpoints.down('sm')]: {
+    textAlign: 'center',
+  },
+}));
+
+const EmptyState = styled(Box)(({ theme }) => ({
+  textAlign: 'center',
+  padding: theme.spacing(8, 0),
+  color: theme.palette.text.secondary,
+  background: theme.palette.background.default,
+  borderRadius: theme.shape.borderRadius * 1.5,
+  boxShadow: theme.shadows[1],
+}));
+
+const StyledGridItem = styled(Grid)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+}));
 
 const Dashboard = () => {
   const [books, setBooks] = useState([]);
@@ -36,17 +93,15 @@ const Dashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const fetchBooks = async () => {
+  const fetchBooks = React.useCallback(async () => {
     setLoading(true);
     setError('');
-    
     try {
       const params = {
         page: pagination.currentPage,
         limit: pagination.booksPerPage,
         ...filters
       };
-      
       const response = await booksAPI.getAll(params);
       setBooks(response.data.books);
       setPagination(prev => ({
@@ -61,11 +116,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.currentPage, pagination.booksPerPage, filters]);
 
   useEffect(() => {
     fetchBooks();
-  }, [pagination.currentPage, filters]);
+  }, [pagination.currentPage, filters, fetchBooks]);
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
@@ -89,7 +144,7 @@ const Dashboard = () => {
 
   if (loading && books.length === 0) {
     return (
-      <Container maxWidth="lg">
+      <StyledContainer maxWidth="lg">
         <Box 
           sx={{ 
             display: 'flex', 
@@ -100,32 +155,20 @@ const Dashboard = () => {
         >
           <CircularProgress size={60} />
         </Box>
-      </Container>
+      </StyledContainer>
     );
   }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          gutterBottom
-          sx={{ 
-            fontWeight: 600,
-            textAlign: isMobile ? 'center' : 'left'
-          }}
-        >
+    <StyledContainer maxWidth="lg">
+      <HeaderSection>
+        <Title variant="h4" component="h1" gutterBottom>
           Discover Great Books
-        </Typography>
-        <Typography 
-          variant="body1" 
-          color="text.secondary"
-          sx={{ textAlign: isMobile ? 'center' : 'left' }}
-        >
+        </Title>
+        <Subtitle variant="body1">
           Explore our collection and find your next favorite read
-        </Typography>
-      </Box>
+        </Subtitle>
+      </HeaderSection>
 
       <SearchAndFilter
         filters={filters}
@@ -134,27 +177,27 @@ const Dashboard = () => {
       />
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
           {error}
         </Alert>
       )}
 
       {books.length === 0 && !loading ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
+        <EmptyState>
           <Typography variant="h6" color="text.secondary" gutterBottom>
             No books found
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Try adjusting your search criteria or filters
           </Typography>
-        </Box>
+        </EmptyState>
       ) : (
         <>
-          <Grid container spacing={isMobile ? 2 : 3} alignItems="stretch">
+          <Grid container spacing={isMobile ? 2 : 3} alignItems="stretch" sx={{ mt: 1 }}>
             {books.map((book) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} key={book.id} display="flex" flexDirection="column">
-                <BookCard book={book} sx={{ height: '100%', width: '100%' }} />
-              </Grid>
+              <StyledGridItem size={{ xs: 12, sm: 6, md: 3, lg: 3 }} key={book.id}>
+                <BookCard book={book} sx={{ height: '100%', width: '100%', borderRadius: 3, boxShadow: theme.shadows[1], background: theme.palette.background.default }} />
+              </StyledGridItem>
             ))}
           </Grid>
 
@@ -173,7 +216,7 @@ const Dashboard = () => {
           <CircularProgress />
         </Box>
       )}
-    </Container>
+    </StyledContainer>
   );
 };
 
