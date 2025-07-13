@@ -13,7 +13,7 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../utils/AuthContext';
 
@@ -98,6 +98,16 @@ const Navbar = () => {
                 open={Boolean(mobileMenuAnchor)}
                 onClose={handleMenuClose}
               >
+                <MenuItem disabled>
+                  <Typography variant="body2">
+                    Welcome, {user?.name}!
+                  </Typography>
+                </MenuItem>
+                <MenuItem disabled>
+                  <Typography variant="caption" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                </MenuItem>
                 <MenuItem onClick={() => handleNavigation('/dashboard')}>
                   Dashboard
                 </MenuItem>
@@ -106,9 +116,6 @@ const Navbar = () => {
                     Admin Panel
                   </MenuItem>
                 )}
-                <MenuItem onClick={handleProfileMenuOpen}>
-                  Profile
-                </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   Logout
                 </MenuItem>
