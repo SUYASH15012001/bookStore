@@ -150,10 +150,10 @@ const Dashboard = () => {
         </Box>
       ) : (
         <>
-          <Grid container spacing={isMobile ? 2 : 3}>
+          <Grid container spacing={isMobile ? 2 : 3} alignItems="stretch">
             {books.map((book) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 2 }} key={book.id}>
-                <BookCard book={book} />
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} key={book.id} display="flex" flexDirection="column">
+                <BookCard book={book} sx={{ height: '100%', width: '100%' }} />
               </Grid>
             ))}
           </Grid>

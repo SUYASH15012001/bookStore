@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const BookCard = ({ book }) => {
+const BookCard = ({ book, sx = {} }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -25,7 +25,9 @@ const BookCard = ({ book }) => {
   return (
     <Card 
       sx={{ 
+        ...sx,
         height: '100%', 
+        width: '100%',
         display: 'flex', 
         flexDirection: 'column',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
@@ -35,7 +37,7 @@ const BookCard = ({ book }) => {
         }
       }}
     >
-      <CardContent sx={{ flexGrow: 1, p: isMobile ? 2 : 3 }}>
+      <CardContent sx={{ flexGrow: 1, p: isMobile ? 2 : 3, width: '100%' }}>
         <Typography 
           variant={isMobile ? "h6" : "h5"} 
           component="h2" 
@@ -102,7 +104,7 @@ const BookCard = ({ book }) => {
         )}
       </CardContent>
 
-      <CardActions sx={{ p: isMobile ? 2 : 3, pt: 0 }}>
+      <CardActions sx={{ p: isMobile ? 2 : 3, pt: 0, width: '100%' }}>
         <Button 
           size="small" 
           color="primary" 
