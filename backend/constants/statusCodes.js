@@ -10,7 +10,7 @@ const STATUS_CODES = {
   CONFLICT: 409,
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500
-};
+}
 
 // Common Response Messages
 const MESSAGES = {
@@ -22,7 +22,7 @@ const MESSAGES = {
   BOOK_DELETED: 'Book deleted successfully',
   REVIEW_ADDED: 'Review added successfully',
   SERVER_RUNNING: 'Server is running!',
-  
+
   // Error Messages
   SERVER_ERROR: 'Server error',
   SOMETHING_WENT_WRONG: 'Something went wrong!',
@@ -37,7 +37,7 @@ const MESSAGES = {
   BOOK_EXISTS: 'A book with the same title, author, and genre already exists.',
   REVIEW_EXISTS: 'You have already reviewed this book',
   NO_FIELDS_TO_UPDATE: 'No fields to update',
-  
+
   // Validation Messages
   NAME_MIN_LENGTH: 'Name must be at least 3 characters',
   EMAIL_INVALID: 'Please provide a valid email',
@@ -49,26 +49,26 @@ const MESSAGES = {
   DESCRIPTION_LENGTH: 'Description must be 10-1000 characters',
   RATING_RANGE: 'Rating must be between 1 and 5',
   COMMENT_LENGTH: 'Comment must be between 10 and 1000 characters'
-};
+}
 
 // Database Error Codes
 const DB_ERROR_CODES = {
   UNIQUE_VIOLATION: '23505',
   FOREIGN_KEY_VIOLATION: '23503',
   NOT_NULL_VIOLATION: '23502'
-};
+}
 
 // JWT Configuration
 const JWT_CONFIG = {
   EXPIRES_IN: '24h'
-};
+}
 
 // Pagination Defaults
 const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_LIMIT: 10,
   MAX_LIMIT: 100
-};
+}
 
 // Sort Configuration
 const SORT_CONFIG = {
@@ -76,7 +76,7 @@ const SORT_CONFIG = {
   ALLOWED_ORDERS: ['ASC', 'DESC'],
   DEFAULT_FIELD: 'created_at',
   DEFAULT_ORDER: 'DESC'
-};
+}
 
 module.exports = {
   STATUS_CODES,
@@ -85,4 +85,4 @@ module.exports = {
   JWT_CONFIG,
   PAGINATION,
   SORT_CONFIG
-}; 
+}

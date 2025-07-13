@@ -1,5 +1,5 @@
-const { body } = require('express-validator');
-const { MESSAGES } = require('../constants/statusCodes');
+const { body } = require('express-validator')
+const { MESSAGES } = require('../constants/statusCodes')
 
 // User validation rules
 const userValidation = {
@@ -17,7 +17,7 @@ const userValidation = {
       .isLength({ min: 6 })
       .withMessage(MESSAGES.PASSWORD_MIN_LENGTH)
   ],
-  
+
   login: [
     body('email')
       .isEmail()
@@ -27,7 +27,7 @@ const userValidation = {
       .notEmpty()
       .withMessage(MESSAGES.PASSWORD_REQUIRED)
   ]
-};
+}
 
 // Book validation rules
 const bookValidation = {
@@ -53,7 +53,7 @@ const bookValidation = {
       .trim()
       .escape()
   ],
-  
+
   update: [
     body('title')
       .optional()
@@ -80,7 +80,7 @@ const bookValidation = {
       .trim()
       .escape()
   ]
-};
+}
 
 // Review validation rules
 const reviewValidation = {
@@ -94,55 +94,55 @@ const reviewValidation = {
       .trim()
       .escape()
   ]
-};
+}
 
 // Query parameter validation
 const queryValidation = {
   pagination: (req, res, next) => {
-    const { page, limit } = req.query;
-    
+    const { page, limit } = req.query
+
     if (page && (!Number.isInteger(+page) || +page < 1)) {
       return res.status(400).json({
         success: false,
         message: 'Page must be a positive integer'
-      });
+      })
     }
-    
+
     if (limit && (!Number.isInteger(+limit) || +limit < 1 || +limit > 100)) {
       return res.status(400).json({
         success: false,
         message: 'Limit must be between 1 and 100'
-      });
+      })
     }
-    
-    next();
+
+    next()
   },
-  
+
   sort: (req, res, next) => {
-    const { sortBy, sortOrder } = req.query;
-    const { SORT_CONFIG } = require('../constants/statusCodes');
-    
+    const { sortBy, sortOrder } = req.query
+    const { SORT_CONFIG } = require('../constants/statusCodes')
+
     if (sortBy && !SORT_CONFIG.ALLOWED_FIELDS.includes(sortBy)) {
       return res.status(400).json({
         success: false,
         message: `Invalid sort field. Allowed: ${SORT_CONFIG.ALLOWED_FIELDS.join(', ')}`
-      });
+      })
     }
-    
+
     if (sortOrder && !SORT_CONFIG.ALLOWED_ORDERS.includes(sortOrder.toUpperCase())) {
       return res.status(400).json({
         success: false,
         message: 'Sort order must be ASC or DESC'
-      });
+      })
     }
-    
-    next();
+
+    next()
   }
-};
+}
 
 module.exports = {
   userValidation,
   bookValidation,
   reviewValidation,
   queryValidation
-}; 
+}

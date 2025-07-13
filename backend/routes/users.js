@@ -1,8 +1,8 @@
-const express = require('express');
-const { authenticateToken } = require('../middleware/auth');
-const { sendSuccessResponse } = require('../utils/errorHandler');
+const express = require('express')
+const { authenticateToken } = require('../middleware/auth')
+const { sendSuccessResponse } = require('../utils/errorHandler')
 
-const router = express.Router();
+const router = express.Router()
 
 // Get current user info
 router.get('/me', authenticateToken, (req, res) => {
@@ -13,7 +13,7 @@ router.get('/me', authenticateToken, (req, res) => {
       email: req.user.email,
       role: req.user.role
     }
-  });
-});
+  })
+})
 
-module.exports = router; 
+module.exports = router
