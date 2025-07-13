@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -18,16 +18,33 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  // Local state for immediate UI updates
+  const [localFilters, setLocalFilters] = useState({
+    title: filters.title || '',
+    author: filters.author || ''
+  });
+
   const debounceRef = useRef();
+  
   const handleChange = (field) => (event) => {
     const value = event.target.value;
+    
+    // Update local state immediately for smooth UI
+    setLocalFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Debounce API call
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       onFilterChange({ ...filters, [field]: value });
-    }, 400);
+    }, 500);
   };
 
   const handleClear = () => {
+    // Clear both local state and API filters
+    setLocalFilters({ title: '', author: '' });
     onClearFilters();
   };
 
@@ -38,11 +55,13 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
           <TextField
             fullWidth
             label="Search by title"
-            value={filters.title || ''}
+            value={localFilters.title}
             onChange={handleChange('title')}
             size="small"
-            InputProps={{
-              startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />
+            slotProps={{
+              input: {
+                startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />
+              }
             }}
           />
         </Grid>
@@ -50,7 +69,7 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
           <TextField
             fullWidth
             label="Filter by author"
-            value={filters.author || ''}
+            value={localFilters.author}
             onChange={handleChange('author')}
             size="small"
           />
