@@ -40,6 +40,7 @@ const BookDetails = () => {
     comment: ''
   });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [commentError, setCommentError] = useState('');
 
   const fetchBook = async () => {
     try {
@@ -72,12 +73,23 @@ const BookDetails = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!reviewForm.comment.trim()) {
+    const trimmed = reviewForm.comment.trim();
+    if (!trimmed) {
+      setCommentError('Please enter a review comment');
       toast.error('Please enter a review comment');
       return;
     }
-    
+    if (trimmed.length < 10) {
+      setCommentError('Comment must be at least 10 characters');
+      toast.error('Comment must be at least 10 characters');
+      return;
+    }
+    if (trimmed.length > 1000) {
+      setCommentError('Comment must be at most 1000 characters');
+      toast.error('Comment must be at most 1000 characters');
+      return;
+    }
+    setCommentError('');
     setSubmittingReview(true);
     
     try {
@@ -242,6 +254,9 @@ const BookDetails = () => {
                     onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
                     placeholder="Share your thoughts about this book..."
                     sx={{ mb: 2 }}
+                    slotProps={{ input: { minLength: 10, maxLength: 1000 } }}
+                    error={!!commentError}
+                    helperText={commentError || `${reviewForm.comment.length}/1000`}
                   />
                   <Box sx={{ display: 'flex', gap: 2 }}>
                     <Button

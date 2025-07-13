@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Box,
   TextField,
@@ -18,8 +18,13 @@ const SearchAndFilter = ({ filters, onFilterChange, onClearFilters }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const debounceRef = useRef();
   const handleChange = (field) => (event) => {
-    onFilterChange({ ...filters, [field]: event.target.value });
+    const value = event.target.value;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      onFilterChange({ ...filters, [field]: value });
+    }, 400);
   };
 
   const handleClear = () => {

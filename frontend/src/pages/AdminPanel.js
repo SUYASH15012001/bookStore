@@ -48,6 +48,8 @@ const AdminPanel = () => {
     totalBooks: 0,
     booksPerPage: 12
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -93,10 +95,18 @@ const AdminPanel = () => {
     
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
+    } else if (formData.title.length < 2) {
+      newErrors.title = 'Title must be at least 2 characters';
+    } else if (formData.title.length > 200) {
+      newErrors.title = 'Title must be at most 200 characters';
     }
     
     if (!formData.author.trim()) {
       newErrors.author = 'Author is required';
+    } else if (formData.author.length < 2) {
+      newErrors.author = 'Author must be at least 2 characters';
+    } else if (formData.author.length > 100) {
+      newErrors.author = 'Author must be at most 100 characters';
     }
     
     if (!formData.genre) {
@@ -105,6 +115,10 @@ const AdminPanel = () => {
     
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
+    } else if (formData.description.length < 10) {
+      newErrors.description = 'Description must be at least 10 characters';
+    } else if (formData.description.length > 1000) {
+      newErrors.description = 'Description must be at most 1000 characters';
     }
     
     setFormErrors(newErrors);
@@ -173,19 +187,27 @@ const AdminPanel = () => {
     }
   };
 
-  const handleDelete = async (bookId) => {
-    if (!window.confirm('Are you sure you want to delete this book?')) {
-      return;
-    }
-    
+  const handleDelete = (bookId) => {
+    setBookToDelete(bookId);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDelete = async () => {
+    if (!bookToDelete) return;
     try {
-      await booksAPI.delete(bookId);
+      await booksAPI.delete(bookToDelete);
       toast.success('Book deleted successfully!');
       fetchBooks();
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to delete book';
       toast.error(message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setBookToDelete(null);
     }
+  };
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setBookToDelete(null);
   };
 
   const handleChange = (e) => {
@@ -342,6 +364,7 @@ const AdminPanel = () => {
                   helperText={formErrors.title}
                   disabled={submitting}
                   required
+                  slotProps={{ input: { minLength: 2, maxLength: 200 } }}
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -355,6 +378,7 @@ const AdminPanel = () => {
                   helperText={formErrors.author}
                   disabled={submitting}
                   required
+                  slotProps={{ input: { minLength: 2, maxLength: 100 } }}
                 />
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
@@ -387,6 +411,7 @@ const AdminPanel = () => {
                   error={!!formErrors.description}
                   helperText={formErrors.description}
                   disabled={submitting}
+                  slotProps={{ input: { minLength: 10, maxLength: 1000 } }}
                   required
                 />
               </Grid>
@@ -405,6 +430,16 @@ const AdminPanel = () => {
             </Button>
           </DialogActions>
         </Box>
+      </Dialog>
+      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+        <DialogTitle>Delete Book</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this book? This action cannot be undone.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">Delete</Button>
+        </DialogActions>
       </Dialog>
     </Container>
   );

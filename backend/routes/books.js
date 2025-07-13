@@ -224,10 +224,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', [
   authenticateToken,
   requireAdmin,
-  body('title').notEmpty().withMessage('Title is required'),
-  body('author').notEmpty().withMessage('Author is required'),
-  body('genre').optional(),
-  body('description').optional()
+  body('title').isLength({ min: 2, max: 200 }).withMessage('Title must be 2-200 characters'),
+  body('author').isLength({ min: 2, max: 100 }).withMessage('Author must be 2-100 characters'),
+  body('genre').isLength({ min: 2, max: 50 }).withMessage('Genre must be 2-50 characters'),
+  body('description').isLength({ min: 10, max: 1000 }).withMessage('Description must be 10-1000 characters'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -259,10 +259,10 @@ router.post('/', [
 router.put('/:id', [
   authenticateToken,
   requireAdmin,
-  body('title').optional().notEmpty().withMessage('Title cannot be empty'),
-  body('author').optional().notEmpty().withMessage('Author cannot be empty'),
-  body('genre').optional(),
-  body('description').optional()
+  body('title').optional().isLength({ min: 2, max: 200 }).withMessage('Title must be 2-200 characters'),
+  body('author').optional().isLength({ min: 2, max: 100 }).withMessage('Author must be 2-100 characters'),
+  body('genre').optional().isLength({ min: 2, max: 50 }).withMessage('Genre must be 2-50 characters'),
+  body('description').optional().isLength({ min: 10, max: 1000 }).withMessage('Description must be 10-1000 characters'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
