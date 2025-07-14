@@ -1,5 +1,5 @@
 const pool = require('../config/db')
-const { STATUS_CODES, MESSAGES } = require('../constants/statusCodes')
+const { STATUS_CODES, MESSAGES } = require('../constants/consts')
 const { verifyToken, extractTokenFromHeader } = require('../utils/jwt')
 const { sendErrorResponse } = require('../utils/errorHandler')
 

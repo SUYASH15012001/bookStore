@@ -51,7 +51,7 @@ A modern React frontend for the book review platform built with Material-UI (MUI
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js v24
 - npm or yarn
 - Backend server running (see backend README)
 

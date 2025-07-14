@@ -27,7 +27,7 @@ import { Add, Edit, Delete } from '@mui/icons-material';
 import { booksAPI } from '../utils/api';
 import CustomPagination from '../components/Pagination';
 import { validateBookForm, clearFieldError, isFormValid } from '../utils/validation';
-import { showSuccessMessage, withFormHandling } from '../utils/errorHandler';
+import { showSuccessMessage, withFormHandling, handleApiError } from '../utils/errorHandler';
 import { MESSAGES, GENRES, PAGINATION } from '../constants/api';
 
 const AdminPanel = () => {
@@ -56,7 +56,7 @@ const AdminPanel = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const fetchBooks = async (page = pagination.currentPage) => {
+  const fetchBooks = async (page = 1) => {
     setLoading(true);
     setError('');
     try {
@@ -73,8 +73,8 @@ const AdminPanel = () => {
         totalBooks: response.data.pagination.totalBooks
       }));
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to fetch books';
-      setError(message);
+      setError(error);
+      handleApiError(error);
     } finally {
       setLoading(false);
     }

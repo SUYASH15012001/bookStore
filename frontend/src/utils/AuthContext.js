@@ -41,18 +41,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.login(credentials);
       const { user, token } = response.data;
-      
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       setUser(user);
-      
       return response.data;
     } catch (error) {
       handleApiError(error, {
-        400: 'Invalid credentials. Please check your email and password.',
-        401: 'Invalid credentials. Please check your email and password.'
+        'Invalid credentials': 'Invalid credentials. Please check your email and password.'
       });
-      throw error;
     }
   };
 
@@ -60,18 +56,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.register(userData);
       const { user, token } = response.data;
-      
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       setUser(user);
-      
       return response.data;
     } catch (error) {
       handleApiError(error, {
-        400: 'Registration failed. Please check your input.',
-        409: 'User with this email already exists.'
+        'already exists': 'User with this email already exists.'
       });
-      throw error;
     }
   };
 

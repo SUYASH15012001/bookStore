@@ -66,7 +66,8 @@ const Register = () => {
     }
     
     const { name, email, password } = formData;
-    await register({ name, email, password });
+    const result = await register({ name, email, password });
+    if (!result) return; // Only proceed if registration succeeded
     showSuccessMessage('Registration successful! Welcome to Book Reviews!');
     navigate(ROUTES.DASHBOARD);
   }, setLoading);

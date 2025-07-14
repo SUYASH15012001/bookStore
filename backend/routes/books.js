@@ -2,7 +2,7 @@ const express = require('express')
 const { validationResult } = require('express-validator')
 const pool = require('../config/db')
 const { authenticateToken, requireAdmin } = require('../middleware/auth')
-const { STATUS_CODES, MESSAGES, PAGINATION, SORT_CONFIG } = require('../constants/statusCodes')
+const { STATUS_CODES, MESSAGES, PAGINATION, SORT_CONFIG } = require('../constants/consts')
 const { sendSuccessResponse, asyncHandler } = require('../utils/errorHandler')
 const { bookValidation, reviewValidation, queryValidation } = require('../utils/validation')
 
@@ -29,8 +29,8 @@ router.get('/', queryValidation.pagination, queryValidation.sort, asyncHandler(a
 
   if (genre) {
     paramCount++
-    whereClause += ` AND genre ILIKE $${paramCount}`
-    queryParams.push(`%${genre}%`)
+    whereClause += ` AND LOWER(genre) = LOWER($${paramCount})`
+    queryParams.push(genre)
   }
 
   if (author) {

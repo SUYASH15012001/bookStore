@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { booksAPI, reviewsAPI } from '../utils/api';
 import { useAuth } from '../utils/AuthContext';
 import ReviewList from '../components/ReviewList';
+import { handleApiError } from '../utils/errorHandler';
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -47,9 +48,8 @@ const BookDetails = () => {
       const response = await booksAPI.getById(id);
       setBook(response.data.book);
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to fetch book details';
-      setError(message);
-      toast.error(message);
+      setError(error);
+      handleApiError(error);
     } finally {
       setLoading(false);
     }
@@ -102,8 +102,7 @@ const BookDetails = () => {
       // Refresh book data to update average rating
       fetchBook();
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to submit review';
-      toast.error(message);
+      handleApiError(error);
     } finally {
       setSubmittingReview(false);
     }

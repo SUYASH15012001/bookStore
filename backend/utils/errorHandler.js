@@ -1,4 +1,4 @@
-const { STATUS_CODES, MESSAGES, DB_ERROR_CODES } = require('../constants/statusCodes')
+const { STATUS_CODES, MESSAGES, DB_ERROR_CODES, USER_EMAIL_CONSTRAINT, BOOK_UNIQUE_CONSTRAINT, REVIEW_UNIQUE_CONSTRAINT } = require('../constants/consts')
 
 // Enhanced error logging
 const logError = (error, context = {}) => {
@@ -20,10 +20,21 @@ const logError = (error, context = {}) => {
 const handleDatabaseError = (error) => {
   switch (error.code) {
     case DB_ERROR_CODES.UNIQUE_VIOLATION:
-      return {
-        status: STATUS_CODES.CONFLICT,
-        message: MESSAGES.USER_EXISTS
+      let message;
+      switch (error.constraint) {
+        case USER_EMAIL_CONSTRAINT:
+          message = MESSAGES.USER_EXISTS;
+          break;
+        case BOOK_UNIQUE_CONSTRAINT:
+          message = MESSAGES.BOOK_EXISTS;
+          break;
+        case REVIEW_UNIQUE_CONSTRAINT:
+          message = MESSAGES.REVIEW_EXISTS;
+          break;
+        default:
+          message = 'Duplicate entry';
       }
+      return { status: STATUS_CODES.CONFLICT, message };
     case DB_ERROR_CODES.FOREIGN_KEY_VIOLATION:
       return {
         status: STATUS_CODES.BAD_REQUEST,

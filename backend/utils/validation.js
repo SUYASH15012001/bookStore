@@ -1,5 +1,5 @@
 const { body } = require('express-validator')
-const { MESSAGES } = require('../constants/statusCodes')
+const { MESSAGES } = require('../constants/consts')
 
 // User validation rules
 const userValidation = {
@@ -120,7 +120,7 @@ const queryValidation = {
 
   sort: (req, res, next) => {
     const { sortBy, sortOrder } = req.query
-    const { SORT_CONFIG } = require('../constants/statusCodes')
+    const { SORT_CONFIG } = require('../constants/consts')
 
     if (sortBy && !SORT_CONFIG.ALLOWED_FIELDS.includes(sortBy)) {
       return res.status(400).json({

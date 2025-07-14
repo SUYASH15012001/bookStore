@@ -2,6 +2,16 @@
 
 A Node.js/Express backend for the book review platform with PostgreSQL database.
 
+## Requirements
+
+- **Node.js v24** (or higher) is required.  
+  You can check your version with:
+  ```bash
+  node -v
+  ```
+- **npm** (comes with Node.js)
+- **PostgreSQL** (for the database)
+
 ## Setup Instructions
 
 1. **Clone the repository:**

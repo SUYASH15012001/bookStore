@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const { JWT_CONFIG } = require('../constants/statusCodes')
+const { JWT_CONFIG } = require('../constants/consts')
 
 // Generate JWT token
 const generateToken = (payload) => {

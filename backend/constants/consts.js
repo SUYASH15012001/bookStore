@@ -78,11 +78,19 @@ const SORT_CONFIG = {
   DEFAULT_ORDER: 'DESC'
 }
 
+// Unique Constraint Names
+const USER_EMAIL_CONSTRAINT = 'users_email_key';
+const BOOK_UNIQUE_CONSTRAINT = 'unique_book_combo';
+const REVIEW_UNIQUE_CONSTRAINT = 'unique_user_book_review';
+
 module.exports = {
   STATUS_CODES,
   MESSAGES,
   DB_ERROR_CODES,
   JWT_CONFIG,
   PAGINATION,
-  SORT_CONFIG
+  SORT_CONFIG,
+  USER_EMAIL_CONSTRAINT,
+  BOOK_UNIQUE_CONSTRAINT,
+  REVIEW_UNIQUE_CONSTRAINT
 }

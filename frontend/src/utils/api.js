@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG, STORAGE_KEYS, ROUTES } from '../constants/api';
+import { API_CONFIG, STORAGE_KEYS } from '../constants/api';
 
 const api = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -25,33 +25,20 @@ api.interceptors.request.use(
 
 // Response interceptor to handle errors and new response format
 api.interceptors.response.use(
-  (response) => {
-    // Handle new backend response format
-    if (response.data && typeof response.data === 'object') {
-      // If response has success field, it's the new format
-      if ('success' in response.data) {
-        return response;
-      }
-      // Legacy format - wrap in new format for consistency
-      return {
-        ...response,
-        data: {
-          success: true,
-          message: 'Success',
-          data: response.data
-        }
-      };
+  response => response,
+  error => {
+    let message = 'Something went wrong!';
+    if (error.response) {
+      // Backend responded with an error
+      message = error.response.data?.message || message;
+    } else if (error.request) {
+      // No response from backend (network error)
+      message = 'Network error. Please check your connection.';
     }
-    return response;
-  },
-  (error) => {
-    // Handle authentication errors
-    if (error.response?.status === 401) {
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      window.location.href = ROUTES.LOGIN;
-    }
-    return Promise.reject(error);
+    // Log for debugging
+    console.error('API Error:', error);
+    // Throw just the message string
+    throw message;
   }
 );
 

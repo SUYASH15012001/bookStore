@@ -50,9 +50,12 @@ const Login = () => {
       return;
     }
     
-    await login(formData);
+    const data = await login(formData);
+    if (!data) {
+      return;
+    }
     showSuccessMessage(MESSAGES.LOGIN_SUCCESS);
-    navigate(ROUTES.DASHBOARD);
+    navigate(ROUTES.DASHBOARD, { state: { user: data.user } });
   }, setLoading);
 
   return (

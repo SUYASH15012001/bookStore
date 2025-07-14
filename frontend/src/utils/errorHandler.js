@@ -1,8 +1,14 @@
 import { toast } from 'react-toastify';
-import { STATUS_CODES, MESSAGES } from '../constants/api';
+import { MESSAGES } from '../constants/api';
 
 // Enhanced error logging
 export const logError = (error, context = {}) => {
+  // If error is a string, just log it
+  if (typeof error === 'string') {
+    console.error('FRONTEND ERROR:', error, context);
+    return;
+  }
+  // Otherwise, log as before
   const errorInfo = {
     timestamp: new Date().toISOString(),
     message: error.message,
@@ -12,52 +18,26 @@ export const logError = (error, context = {}) => {
     url: error.config?.url,
     method: error.config?.method
   };
-
   console.error('FRONTEND ERROR:', JSON.stringify(errorInfo, null, 2));
 };
 
 // Handle API errors and show appropriate user feedback
 export const handleApiError = (error, customMessages = {}) => {
   logError(error, { customMessages });
-
-  const status = error.response?.status;
-  const serverMessage = error.response?.data?.message;
-  
-  let message = MESSAGES.SERVER_ERROR;
-
-  // Check for custom messages first
-  if (customMessages[status]) {
-    message = customMessages[status];
-  } else if (serverMessage) {
-    message = serverMessage;
-  } else {
-    // Default messages based on status code
-    switch (status) {
-      case STATUS_CODES.BAD_REQUEST:
-        message = MESSAGES.VALIDATION_ERROR;
+  let message = error;
+  // If error is an object, fallback to generic message
+  if (typeof error !== 'string') {
+    message = MESSAGES.SERVER_ERROR;
+  }
+  // Check for custom messages (by string match)
+  if (customMessages && typeof customMessages === 'object') {
+    for (const [key, val] of Object.entries(customMessages)) {
+      if (message && message.includes(key)) {
+        message = val;
         break;
-      case STATUS_CODES.UNAUTHORIZED:
-        message = MESSAGES.UNAUTHORIZED;
-        break;
-      case STATUS_CODES.FORBIDDEN:
-        message = MESSAGES.FORBIDDEN;
-        break;
-      case STATUS_CODES.NOT_FOUND:
-        message = MESSAGES.NOT_FOUND;
-        break;
-      case STATUS_CODES.CONFLICT:
-        message = serverMessage || 'Resource already exists';
-        break;
-      case STATUS_CODES.INTERNAL_SERVER_ERROR:
-        message = MESSAGES.SERVER_ERROR;
-        break;
-      default:
-        if (!error.response) {
-          message = MESSAGES.NETWORK_ERROR;
-        }
+      }
     }
   }
-
   toast.error(message);
   return message;
 };
@@ -110,7 +90,6 @@ export const withErrorHandling = (asyncFunction, customMessages = {}) => {
       return await asyncFunction(...args);
     } catch (error) {
       handleApiError(error, customMessages);
-      throw error;
     }
   };
 };
@@ -124,7 +103,6 @@ export const withFormHandling = (asyncFunction, setLoading, customMessages = {})
       return result;
     } catch (error) {
       handleApiError(error, customMessages);
-      throw error;
     } finally {
       setLoading(false);
     }

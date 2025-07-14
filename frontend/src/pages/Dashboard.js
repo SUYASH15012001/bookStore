@@ -10,11 +10,11 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { toast } from 'react-toastify';
 import { booksAPI } from '../utils/api';
 import BookCard from '../components/BookCard';
 import SearchAndFilter from '../components/SearchAndFilter';
 import CustomPagination from '../components/Pagination';
+import { handleApiError } from '../utils/errorHandler';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   background: theme.palette.background.paper,
@@ -110,9 +110,8 @@ const Dashboard = () => {
         totalBooks: response.data.pagination.totalBooks
       }));
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to fetch books';
-      setError(message);
-      toast.error(message);
+      setError(error);
+      handleApiError(error);
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const path = require('path')
-const { STATUS_CODES, MESSAGES } = require('./constants/statusCodes')
+const { STATUS_CODES, MESSAGES } = require('./constants/consts')
 const { sendErrorResponse } = require('./utils/errorHandler')
 
 // Load environment variables
